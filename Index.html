@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>অদৃশ্য মায়া - M Zixu. Z Panthom</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-secondary: #111118;
+            --surface: rgba(25, 25, 40, 0.65);
+            --surface-hover: rgba(35, 35, 55, 0.75);
+            --text: #e8e0d8;
+            --text-secondary: #b8a99a;
+            --accent: #c4727a;
+            --accent-glow: rgba(196, 114, 122, 0.35);
+            --gold: #b8936e;
+            --gold-glow: rgba(184, 147, 110, 0.3);
+            --border: rgba(255, 255, 255, 0.07);
+            --border-strong: rgba(255, 255, 255, 0.13);
+            --shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+            --shadow-sm: 0 3px 15px rgba(0, 0, 0, 0.35);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --radius-xs: 8px;
+            --font-main: 'Noto Sans Bengali', 'SolaimanLipi', 'Siyam Rupali', 'Kalpurush', 'Vrinda', system-ui, sans-serif;
+            --transition: 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            --transition-fast: 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+            --blur: 20px;
+            --blur-light: 12px;
+            --caption-size: 1.35rem;
+            --caption-line-height: 2.1;
+        }
+
+        .light-mode {
+            --bg: #f5f0ea;
+            --bg-secondary: #ede6dc;
+            --surface: rgba(255, 252, 248, 0.7);
+            --surface-hover: rgba(255, 250, 242, 0.85);
+            --text: #2a1f1a;
+            --text-secondary: #5c4a3d;
+            --accent: #b5555f;
+            --accent-glow: rgba(181, 85, 95, 0.2);
+            --gold: #8b6845;
+            --gold-glow: rgba(139, 104, 69, 0.2);
+            --border: rgba(0, 0, 0, 0.06);
+            --border-strong: rgba(0, 0, 0, 0.11);
+            --shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+            --shadow-sm: 0 3px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        html {
+            font-size: 16px;
+            height: 100%;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg);
+            color: var(--text);
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition), color var(--transition);
+            background-image:
+                radial-gradient(ellipse at 25% 20%, rgba(180, 100, 110, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 70%, rgba(160, 120, 90, 0.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(140, 100, 130, 0.03) 0%, transparent 70%);
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            opacity: 1;
+            visibility: visible;
+            background-image:
+                radial-gradient(ellipse at center, rgba(180, 110, 120, 0.08) 0%, transparent 65%),
+                radial-gradient(ellipse at 40% 45%, rgba(160, 130, 100, 0.04) 0%, transparent 60%);
+        }
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .loader-icon {
+            width: 70px;
+            height: 70px;
+            border: 3px solid var(--border-strong);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 28px;
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .loader-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--text);
+            text-align: center;
+            animation: pulse-text 1.8s ease-in-out infinite;
+        }
+        .loader-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            letter-spacing: 0.06em;
+            animation: fade-in-delay 1.2s ease forwards;
+            opacity: 0;
+        }
+        @keyframes pulse-text {
+            0%,
+            100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        @keyframes fade-in-delay {
+            to {
+                opacity: 0.8;
+            }
+        }
+
+        /* Main Container */
+        #app-container {
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        @media (min-width: 768px) {
+            #app-container {
+                height: 92vh;
+                max-height: 880px;
+                border-radius: var(--radius);
+                margin: 0 16px;
+                border: 1px solid var(--border);
+            }
+        }
+
+        /* Top Bar */
+        #top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            gap: 8px;
+            z-index: 100;
+            transition: opacity var(--transition-fast), transform var(--transition-fast);
+            flex-shrink: 0;
+            background: transparent;
+        }
+        #top-bar.auto-hidden {
+            opacity: 0;
+            transform: translateY(-60px);
+            pointer-events: none;
+        }
+        .top-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--border-strong);
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(var(--blur-light));
+            -webkit-backdrop-filter: blur(var(--blur-light));
+            flex-shrink: 0;
+        }
+        .top-btn:active {
+            transform: scale(0.9);
+            background: var(--surface-hover);
+            border-color: var(--accent);
+        }
+        .page-indicator {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+            min-width: 70px;
+            text-align: center;
+            transition: color var(--transition);
+        }
+
+        /* Caption Card Area */
+        #card-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1200px;
+            position: relative;
+            padding: 8px 20px;
+            z-index: 50;
+            touch-action: pan-y;
+            overflow: hidden;
+        }
+        #caption-card {
+            width: 100%;
+            max-width: 440px;
+            min-height: 280px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px 24px 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            transition: transform 0.45s cubic-bezier(0.25, 0.1, 0.25, 1),
+                opacity 0.35s ease,
+                box-shadow var(--transition);
+            position: relative;
+            cursor: default;
+            will-change: transform, opacity;
+            transform-style: preserve-3d;
+        }
+        #caption-card.swiping-left {
+            transform: translateX(-60px) rotateY(-8deg);
+            opacity: 0.6;
+            box-shadow: -15px 5px 35px rgba(0, 0, 0, 0.45);
+        }
+        #caption-card.swiping-right {
+            transform: translateX(60px) rotateY(8deg);
+            opacity: 0.6;
+            box-shadow: 15px 5px 35px rgba(0, 0, 0, 0.45);
+        }
+        #caption-card.page-turn-next {
+            animation: pageTurnNext 0.45s ease forwards;
+        }
+        #caption-card.page-turn-prev {
+            animation: pageTurnPrev 0.45s ease forwards;
+        }
+        @keyframes pageTurnNext {
+            0% {
+                transform: rotateY(0);
+                opacity: 1;
+            }
+            40% {
+                transform: rotateY(-25deg) translateX(-30px);
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotateY(0) translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes pageTurnPrev {
+            0% {
+                transform: rotateY(0);
+                opacity: 1;
+            }
+            40% {
+                transform: rotateY(25deg) translateX(30px);
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotateY(0) translateX(0);
+                opacity: 1;
+            }
+        }
+        #caption-card .card-ornament {
+            position: absolute;
+            top: 16px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            opacity: 0.5;
+            letter-spacing: 0.08em;
+        }
+        #caption-text {
+            font-size: var(--caption-size);
+            line-height: var(--caption-line-height);
+            font-weight: 400;
+            color: var(--text);
+            transition: font-size var(--transition-fast), color var(--transition);
+            z-index: 2;
+            position: relative;
+            padding: 10px 0;
+            word-break: break-word;
+            hyphens: auto;
+            max-width: 100%;
+        }
+        #caption-card .card-shadow-accent {
+            position: absolute;
+            inset: -2px;
+            border-radius: var(--radius);
+            background: transparent;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity var(--transition);
+            pointer-events: none;
+            box-shadow: 0 0 40px var(--accent-glow), 0 0 80px var(--gold-glow);
+        }
+        #caption-card.favorited .card-shadow-accent {
+            opacity: 0.7;
+        }
+
+        /* Bottom Navigation */
+        #bottom-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 10px 16px 14px;
+            z-index: 100;
+            flex-shrink: 0;
+            transition: opacity var(--transition-fast), transform var(--transition-fast);
+            flex-wrap: wrap;
+        }
+        #bottom-nav.auto-hidden {
+            opacity: 0;
+            transform: translateY(60px);
+            pointer-events: none;
+        }
+        .nav-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--border-strong);
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(var(--blur-light));
+            -webkit-backdrop-filter: blur(var(--blur-light));
+            flex-shrink: 0;
+        }
+        .nav-btn:active {
+            transform: scale(0.88);
+            background: var(--surface-hover);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .nav-btn.accent-btn {
+            background: rgba(196, 114, 122, 0.2);
+            border-color: var(--accent);
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .nav-btn.accent-btn:active {
+            background: rgba(196, 114, 122, 0.35);
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+        .nav-btn.small-btn {
+            width: 34px;
+            height: 34px;
+            font-size: 0.9rem;
+        }
+
+        /* Progress Bar */
+        #progress-bar-wrap {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border);
+            z-index: 110;
+            border-radius: 0 0 var(--radius) var(--radius);
+            overflow: hidden;
+        }
+        #progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent));
+            border-radius: inherit;
+            transition: width 0.35s ease;
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        /* Search Overlay */
+        #search-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 30px 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition), visibility var(--transition);
+        }
+        #search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        #search-overlay .search-box {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        #search-input {
+            flex: 1;
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-strong);
+            background: var(--surface);
+            color: var(--text);
+            font-family: var(--font-main);
+            font-size: 1rem;
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            outline: none;
+            transition: all var(--transition-fast);
+        }
+        #search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        #search-results {
+            width: 100%;
+            max-width: 440px;
+            max-height: 55vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 4px 0;
+        }
+        .search-result-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text);
+            backdrop-filter: blur(var(--blur-light));
+            -webkit-backdrop-filter: blur(var(--blur-light));
+        }
+        .search-result-item:active {
+            background: var(--surface-hover);
+            border-color: var(--accent);
+            transform: scale(0.97);
+        }
+        .search-result-item .result-num {
+            font-size: 0.7rem;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 4px;
+            letter-spacing: 0.04em;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            white-space: nowrap;
+            letter-spacing: 0.03em;
+            box-shadow: var(--shadow-sm);
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Favorites Panel */
+        #favorites-panel {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 30px 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition), visibility var(--transition);
+        }
+        #favorites-panel.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        #favorites-panel h3 {
+            color: var(--text);
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+            letter-spacing: 0.04em;
+        }
+        #favorites-list {
+            width: 100%;
+            max-width: 440px;
+            max-height: 55vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .fav-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(var(--blur-light));
+            -webkit-backdrop-filter: blur(var(--blur-light));
+        }
+        .fav-item:active {
+            background: var(--surface-hover);
+            transform: scale(0.97);
+        }
+        .fav-remove {
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-strong);
+            border-radius: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 380px) {
+            #caption-text {
+                font-size: 1.15rem;
+                line-height: 1.9;
+            }
+            #caption-card {
+                padding: 24px 16px 20px;
+                min-height: 220px;
+            }
+            .nav-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1rem;
+            }
+            .top-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+        }
+        @media (min-width: 420px) {
+            #caption-text {
+                font-size: 1.45rem;
+                line-height: 2.2;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader-icon"></div>
+        <div class="loader-title">অদৃশ্য মায়া</div>
+        <div class="loader-subtitle">M Zixu. Z Panthom</div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <!-- Main App -->
+    <div id="app-container">
+        <!-- Top Bar -->
+        <div id="top-bar">
+            <button class="top-btn" id="btn-menu" title="মেনু" aria-label="মেনু">☰</button>
+            <span class="page-indicator" id="page-indicator">১ / ৫০০+</span>
+            <div style="display:flex;gap:6px;">
+                <button class="top-btn small-btn" id="btn-font-minus" title="ছোট অক্ষর" aria-label="ছোট অক্ষর">A⁻</button>
+                <button class="top-btn small-btn" id="btn-font-plus" title="বড় অক্ষর" aria-label="বড় অক্ষর">A⁺</button>
+                <button class="top-btn" id="btn-theme" title="থিম পরিবর্তন" aria-label="থিম পরিবর্তন">🌓</button>
+            </div>
+        </div>
+
+        <!-- Caption Card Area -->
+        <div id="card-area">
+            <div id="caption-card">
+                <span class="card-ornament">✦</span>
+                <div class="card-shadow-accent"></div>
+                <p id="caption-text"></p>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div id="bottom-nav">
+            <button class="nav-btn" id="btn-prev" title="আগের পৃষ্ঠা" aria-label="আগের পৃষ্ঠা">◀</button>
+            <button class="nav-btn accent-btn" id="btn-random" title="এলোমেলো" aria-label="এলোমেলো">⟳</button>
+            <button class="nav-btn" id="btn-fav" title="প্রিয়তে যোগ করুন" aria-label="প্রিয়তে যোগ করুন">♡</button>
+            <button class="nav-btn" id="btn-copy" title="কপি করুন" aria-label="কপি করুন">📋</button>
+            <button class="nav-btn" id="btn-share" title="শেয়ার করুন" aria-label="শেয়ার করুন">↗</button>
+            <button class="nav-btn" id="btn-next" title="পরের পৃষ্ঠা" aria-label="পরের পৃষ্ঠা">▶</button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progress-bar-wrap">
+            <div id="progress-bar-fill" style="width:0%;"></div>
+        </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div id="search-overlay">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="ক্যাপশন খুঁজুন... (কীওয়ার্ড)">
+            <button class="top-btn" id="btn-search-close" style="width:44px;height:44px;font-size:1.3rem;">✕</button>
+        </div>
+        <div id="search-results"></div>
+    </div>
+
+    <!-- Favorites Panel -->
+    <div id="favorites-panel">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <h3 style="margin:0;">❤️ প্রিয় ক্যাপশন</h3>
+            <button class="top-btn" id="btn-fav-close" style="width:38px;height:38px;">✕</button>
+        </div>
+        <div id="favorites-list"></div>
+    </div>
+
+    <script>
+        (function() {
+            // ──────────────────────────────────────
+            // CAPTIONS DATABASE — 500+ unique Bengali quotes
+            // ──────────────────────────────────────
+            const captions = [
+                // Group: Breakup & Separation (~65)
+                "ভালোবাসার সবচেয়ে কঠিন অধ্যায় হলো সেই মুহূর্ত, যখন দুজন মানুষ একসঙ্গে থেকেও আলাদা হয়ে যায়।",
+                "তোমাকে হারানোর বেদনা প্রতিদিন নতুন করে জাগে, যেন ভোরের কুয়াশার মতো ধীরে ধীরে ছেয়ে ফেলে সবকিছু।",
+                "যে সম্পর্কের ভিত নড়বড়ে, সে সম্পর্ক টিকে থাকলেও তার মধ্যে সুখ খুঁজে পাওয়া দুষ্কর।",
+                "আমরা দুজন ছিলাম এক নদীর দুই তীর—কাছাকাছি থেকেও কখনো মিলিত হওয়ার সুযোগ পাইনি।",
+                "ভাঙা মনটা ঠিক সূর্যাস্তের মতো—সুন্দর লাগে, কিন্তু জানি যে অন্ধকার আসন্ন।",
+                "তোমার চোখে আমি এখন শুধুই এক অচেনা পথিক, যে কখনো তোমার মনে বাসা বেঁধেছিল।",
+                "বিচ্ছেদের যন্ত্রণা কখনো কমে না, শুধু অভ্যস্ত হয়ে যাই ধীরে ধীরে।",
+                "আমাদের গল্পটা শেষ হয়ে গেল এক নিঃশব্দ বিন্দুর মতো, যেখানে কোনো শব্দ ছিল না, ছিল শুধু নীরবতা।",
+                "যে মানুষটা একসময় আমার পৃথিবী ছিল, সে আজ সম্পূর্ণ অচেনা এক দ্বীপ।",
+                "ভালোবাসার পরিণতি সবসময় মিলন নয়, কখনো কখনো তা নীরব বিদায়ও হতে পারে।",
+                "তুমি চলে গেছো, কিন্তু তোমার অনুপস্থিতি প্রতিটি নিঃশ্বাসে অনুভব করি আমি।",
+                "আমাদের ভালোবাসাটা ছিল ভাঙা আয়নার মতো—টুকরোগুলোয় নিজের প্রতিচ্ছবি খুঁজেছি শুধু।",
+                "যে হৃদয় একবার ভেঙেছে, সে হৃদয় আর আগের মতো হতে পারে না—তাতে ফাটল থেকেই যায় চিরদিন।",
+                "বিদায়ের সময়টা ছিল বৃষ্টিভেজা সন্ধ্যার মতো—ঠান্ডা, স্যাঁতসেঁতে আর ভীষণ বিষণ্ণ।",
+                "তোমার দেওয়া শেষ চিঠিটা আজও পড়িনি, হয়তো পড়ার সাহসটুকু জোগাড় করতে পারিনি।",
+                "আমাদের মাঝে এখন শুধু ফেলে আসা স্মৃতির স্তূপ, যার নিচে চাপা পড়ে আছে ভালোবাসার লাশ।",
+                "ভেঙে যাওয়া সম্পর্কের টুকরোগুলো কুড়োতে গিয়ে হাত কেটে যায় বারবার।",
+                "তুমি চলে যাবার পর বুঝলাম, নিঃসঙ্গতা কাকে বলে—একা থাকা আর নিঃসঙ্গতা এক নয়।",
+                "আমার পৃথিবীটা থমকে গিয়েছিল সেদিন, যেদিন তুমি বলেছিলে 'আমি আর পারছি না'।",
+                "যে স্বপ্ন দুজনে একসঙ্গে দেখেছিলাম, আজ সেটা একার দুঃস্বপ্ন হয়ে ফিরে আসে রাতে।",
+                "বিচ্ছেদের পর সবচেয়ে কষ্ট হয় যখন দেখি, তুমি আমাকে ছাড়াও দিব্যি আছো।",
+                "আমাদের প্রেম ছিল বালির ভাস্কর্যের মতো—ঢেউ আসতেই মিলিয়ে গেল সব।",
+                "তোমার নীরবতা আমার কাছে সবচেয়ে বড় উত্তর, যা কখনো শুনতে চাইনি।",
+                "যে রাস্তায় আমরা একসঙ্গে হাঁটতাম, আজ সেই রাস্তায় তোমার ছায়াও পড়ে না।",
+                "ভালোবাসার মৃত্যু ঘটে নীরবে, ঠিক যেন রাতের আকাশে তারার পতনের মতো।",
+                "আমাদের সম্পর্কটা ছিল অসম্পূর্ণ সিম্ফনির মতো—সুর ছিল কিন্তু মিল ছিল না কখনো।",
+                "তোমার চলে যাওয়া ছিল আমার জীবনের সবচেয়ে বড় ঝড়, যা সবকিছু তছনছ করে দিয়েছে।",
+                "যে কথাগুলো বলা হয়নি, সেগুলোই আজ সবচেয়ে বেশি কষ্ট দেয় রাতের নিস্তব্ধতায়।",
+                "বিদায়টা সুন্দর ছিল না, ছিল অভদ্র আর নিষ্ঠুর—ঠিক যেন স্বপ্ন ভাঙার শব্দ।",
+                "তোমাকে ভোলার চেষ্টা করছি, কিন্তু স্মৃতি নামক বিষটা প্রতিদিন ধীরে ধীরে গ্রাস করছে আমাকে।",
+                "আমাদের শেষ দেখা হওয়ার দিনটা আজও মনের মধ্যে গেঁথে আছে—শরতের বিকেল ছিল সেদিন।",
+                "ভাঙা সম্পর্কের কাঁচের টুকরোগুলো পায়ে বিঁধে, হাঁটতে কষ্ট হয়।",
+                "আমি তোমার কাছে ছিলাম একটা অধ্যায়, তুমি আমার কাছে ছিলে পুরো বই।",
+                "তোমার অভাব বোধ করি ঠিক যেন শ্বাস নিতে ভুলে যাওয়া—প্রতি মুহূর্তে টের পাই।",
+                "বিচ্ছেদ শেখায়, মানুষ কতটা একা হতে পারে ভিড়ের মধ্যেও।",
+                "আমাদের ভালোবাসাটা ছিল পোড়া বাড়ির মতো—ছাইয়ের নিচে কিছু স্মৃতি এখনো জ্বলজ্বল করে।",
+                "তুমি চলে যাওয়ার পর থেকে আমার শহরটা কেমন যেন ফাঁকা ফাঁকা লাগে।",
+                "যে হৃদয় ভেঙে গেছে, সে হৃদয়ে আর কোনো সুর বাজে না—শুধু প্রতিধ্বনি শোনা যায়।",
+                "আমাদের শেষ কথোপকথনটা ছিল শীতের হিমেল হাওয়ার মতো—ঠান্ডা আর অনুভূতিহীন।",
+                "তোমার স্মৃতি আমার মনের গহীনে এমনভাবে বাসা বেঁধেছে যে কোনোদিন তা ভাঙতে পারব না।",
+                "সম্পর্ক শেষ হলো, কিন্তু অভ্যাসগুলো রয়ে গেল—তোমাকে মেসেজ করতে ইচ্ছে হয় এখনো।",
+                "বিদায় বেলায় তুমি বলেছিলে 'ভালো থেকো'—কিন্তু তুমি তো জানো, তোমাকে ছাড়া ভালো থাকা সম্ভব নয়।",
+                "আমাদের গল্পটা ছিল না-বলা অনেক কথার সমাহার, যা কখনো প্রকাশ পায়নি।",
+                "তোমার চোখের দিকে তাকিয়ে শেষবারের মতো বুঝেছিলাম—এই বুঝি শেষ।",
+                "ভালোবাসার সমাধিতে আজও জ্বলে কিছু মোমবাতি—স্মৃতির আলোয় টিমটিম করে।",
+                "আমার জীবনে তুমি ছিলে ক্ষণিকের অতিথি, কিন্তু তোমার রেখে যাওয়া দাগ চিরস্থায়ী।",
+                "বিচ্ছেদের যন্ত্রণা বোঝাতে গেলে ভাষা শেষ হয়ে যায়, শুধু অনুভব করা যায় নীরবে।",
+                "তুমি আমার জীবনের সবচেয়ে সুন্দর অধ্যায় ছিলে, যার শেষটা ছিল বিষাদময়।",
+                "আমাদের প্রেমের কবিতাটা অসম্পূর্ণ রইল—কিছু ছত্র লেখা হলো না আর।",
+                "যে মানুষটা আমার আত্মার সঙ্গী ছিল, সে আজ দূর আকাশের তারা হয়ে জ্বলছে।",
+                "তোমার স্পর্শের উষ্ণতা আজও অনুভব করি, অথচ তুমি বহুদূরে।",
+                "আমাদের সম্পর্কটা শেষ হয়ে গেল নিঃশব্দে, কোনো শব্দ না করেই—ঠিক যেন ফুল ঝরে পড়া।",
+                "তুমি চলে যাওয়ার পর আবিষ্কার করলাম, একাকিত্ব কতটা গভীর হতে পারে।",
+                "ভালোবাসার শেষ অধ্যায় লেখা হয় চোখের জলে, কালি নয়।",
+                "আমি তোমার জন্য অপেক্ষা করেছি প্রতিদিন, অথচ তুমি আর কখনো ফিরে এলে না।",
+                "আমাদের দুজনের পথ আলাদা হয়ে গেছে—তোমার পথ আলোয়, আমার পথ অন্ধকারে।",
+                "বিচ্ছেদ মানে শুধু দূরে যাওয়া নয়, বিচ্ছেদ মানে প্রতিদিন একটু একটু করে মরতে থাকা।",
+                "তোমার হাসিটা আজও কানে বাজে, অথচ সেই হাসির কারণ আমি নই আর।",
+                "আমাদের শেষ দিনটাতে বৃষ্টি পড়ছিল—যেন আকাশও কাঁদছিল আমাদের জন্য।",
+                "ভাঙা মনটা সারাতে সারাতে এতদিনে বুঝেছি, কিছু ক্ষত চিরস্থায়ী।",
+                "তুমি ছিলে আমার ভোরের পাখি, যে উড়ে গেল অজানা গন্তব্যে।",
+                "আমাদের প্রেম ছিল সমুদ্রের ঢেউয়ের মতো—এলো, ভাসালো, তারপর মিলিয়ে গেল বালুতে।",
+                "তোমার স্মৃতি আমার রক্তের সাথে মিশে আছে—মুছে ফেলা সম্ভব নয় কখনো।",
+                "যে মানুষটা আমাকে বাঁচতে শিখিয়েছিল, সেই মানুষটাই আমাকে মরতে শিখিয়েছে ভেতরে ভেতরে।",
+
+                // Group: Lost Love (~65)
+                "হারানো ভালোবাসা হলো সেই গান যা কখনো শেষ হয় না, শুধু প্রতিধ্বনি হয়ে ফিরে আসে।",
+                "যে প্রেম একবার হারিয়ে যায়, সে প্রেম তারকা হয়ে আকাশে জ্বলে—দেখা যায়, ছোঁয়া যায় না।",
+                "তোমাকে হারানোর পর বুঝেছি, কিছু শূন্যতা কখনো পূরণ হয় না।",
+                "আমার হৃদয়ের গভীরে তুমি আজও আছো—ঠিক যেন ডুবে যাওয়া শহরের ধ্বংসাবশেষ।",
+                "হারানো ভালোবাসার স্মৃতি হলো ভাঙা কাঁচের টুকরো—জ্বলজ্বল করে, কিন্তু হাতে নিলে কাটে।",
+                "তুমি ছিলে আমার জীবনের শ্রেষ্ঠ উপহার, যা আমি হারিয়েছি নিজের ভুলে।",
+                "যে ভালোবাসা ফিরে আসে না, সে ভালোবাসাই সবচেয়ে বেশি কষ্ট দেয় মনে।",
+                "আমার স্বপ্নগুলো আজও তোমার নাম ধরে ডাকে, অথচ তুমি নেই।",
+                "হারানো প্রেমের ব্যথা সময়ের সাথে কমে না, শুধু গাঢ় হয়—মদের মতো।",
+                "তোমার স্মৃতিগুলো আমার মনের দেয়ালে ছবির মতো টাঙানো—সারাক্ষণ দেখি।",
+                "আমাদের হারানো ভালোবাসাটা এখন শুধুই গল্প, যা কাউকে বলতে পারি না।",
+                "যে মানুষটা আমার সবকিছু ছিল, সে আজ শুধুই স্মৃতির পাতায় একটি নাম।",
+                "তোমাকে হারানোর পর থেকে প্রতিটি সন্ধ্যা বিষণ্ণ লাগে—যেন রঙ হারিয়ে গেছে পৃথিবীর।",
+                "হারানো ভালোবাসা ফিরে পাওয়ার আশাই সবচেয়ে বড় মিথ্যা, তবু আশা ছাড়তে পারি না।",
+                "আমার হৃদয়ে তোমার জন্য যে জায়গাটা ছিল, সেটা আজ শ্মশান—নীরব, ফাঁকা।",
+                "তুমি ছিলে আমার আকাশের চাঁদ, আমি ছিলাম শুধু এক ক্ষুদ্র তারা—তোমার আলোতেই জ্বলতাম।",
+                "যে প্রেম হারিয়ে গেছে, সে প্রেমের দাম বুঝি এখন—যখন আর কিছুই করার নেই।",
+                "তোমার স্পর্শের অভাব বোধ করি প্রতিদিন, ঠিক যেন অক্সিজেন ছাড়া শ্বাস নেওয়া।",
+                "হারানো ভালোবাসা মানে একটা অসম্পূর্ণ ছবি, যা কখনো আঁকা হবে না শেষ।",
+                "আমাদের গল্পটা ছিল রূপকথার মতো—শুধু শেষটা সুখের ছিল না।",
+                "তোমাকে হারিয়ে বুঝেছি, ভালোবাসা কতটা গভীর হতে পারে—এবং কতটা ধ্বংসাত্মকও।",
+                "আমার চোখের সামনে তুমি আছো না, কিন্তু মনের চোখে তুমি সবসময় জাগ্রত।",
+                "হারানো প্রেমের স্মৃতি হলো সেই মেঘ যা বৃষ্টি না হয়েই কেটে যায়—শুধু আঁধার রেখে যায়।",
+                "তোমার সাথে কাটানো প্রতিটি মুহূর্ত এখন সোনালী স্মৃতি, যা মনে করে কষ্ট পাই আর আনন্দও পাই।",
+                "যে ভালোবাসা হারিয়েছি, তাকে খুঁজে বেড়াই প্রতিটি অচেনা মুখের ভিড়ে।",
+                "আমার পৃথিবী থেকে তুমি চলে গেছো, কিন্তু আমার আকাশে তুমি এখনো ধ্রুবতারা।",
+                "হারানো ভালোবাসা হলো সেই নদী যা কখনো সাগরে মেশেনি—মরুভূমিতে হারিয়ে গেছে।",
+                "তোমার চোখে আমি একসময় যে ভালোবাসা দেখেছিলাম, তা এখন শুধুই স্মৃতি।",
+                "আমাদের সম্পর্কটা ছিল ফুলের মতো—ফুটেছিল, সুন্দর ছিল, তারপর ঝরে গেছে।",
+                "তোমাকে হারানোর পর বুঝেছি, কিছু মানুষ সারাজীবনের জন্য থেকে যায়—স্মৃতিতে হলেও।",
+                "যে প্রেম ফিরে আসে না, সে প্রেমই শ্রেষ্ঠ—কারণ তাতে কোনো মলিনতা নেই, শুধু বিশুদ্ধ অনুভূতি।",
+                "আমার হৃদয় আজও তোমার নাম ধরে কাঁদে, অথচ মুখে কিছু বলতে পারি না।",
+                "হারানো ভালোবাসার গল্প বলতে গেলে চোখ ভিজে আসে, গলা ধরে আসে।",
+                "তুমি ছিলে আমার জীবনের শ্রেষ্ঠ অধ্যায়, যা পড়তে পড়তে হঠাৎ ছিঁড়ে গেছে।",
+                "আমাদের প্রেম ছিল অসময়ের বৃষ্টির মতো—অপ্রত্যাশিত, কিন্তু স্মরণীয়।",
+                "যে মানুষটা আমাকে ভালোবাসতে শিখিয়েছিল, সে-ই আমাকে কাঁদতে শিখিয়েছে সবচেয়ে বেশি।",
+                "তোমার স্মৃতির সাথে প্রতিদিন যুদ্ধ করি, আর প্রতিদিন হেরে যাই।",
+                "হারানো প্রেম মানে একটা খালি খাঁচা, যেখানে একসময় পাখি ছিল—এখন শুধু নীরবতা।",
+                "আমাদের শেষবারের মতো দেখা হওয়ার দিনটা ছিল শরতের—ঝরে পড়া পাতার মতো আমরাও ঝরে গেলাম।",
+                "তোমাকে ভুলতে চেয়েও ভুলতে পারি না, কারণ ভুলে যাওয়াটাও একধরনের ভালোবাসা।",
+                "যে ভালোবাসা হারিয়েছি, তা এখন কবিতায় রূপ নিয়েছে—প্রতিটি শব্দে তুমি আছো।",
+                "আমার মনের কোণে তুমি আজও রাজত্ব করো—অদৃশ্য রাজার মতো।",
+                "হারানো ভালোবাসার মূল্য বোঝা যায় যখন আর কিছুই ফেরত পাওয়া যায় না।",
+                "তোমার অনুপস্থিতি এতটাই প্রবল যে তোমার উপস্থিতির চেয়েও বেশি অনুভব করি।",
+                "আমাদের ভালোবাসাটা ছিল পূর্ণিমার চাঁদের মতো—অপূর্ব সুন্দর, কিন্তু রাত শেষে মিলিয়ে যায়।",
+                "তোমাকে হারানোর পর থেকে আমার জীবনটা সাদা-কালো সিনেমার মতো হয়ে গেছে।",
+                "যে প্রেম হারিয়ে যায়, সে প্রেম তারকা হয়ে জ্বলে—সবচেয়ে উজ্জ্বল, কিন্তু ছোঁয়ার বাইরে।",
+                "আমার হৃদয়ের গভীরে তোমার জন্য বরাদ্দ জায়গাটা চিরদিন খালি থাকবে।",
+                "তোমার স্মৃতি আমার জন্য মাদক—জানি ক্ষতিকর, তবু ছাড়তে পারি না।",
+                "হারানো ভালোবাসা হলো বন্ধ ঘরের জানালা—আলো আসে না, বাতাস আসে না, শুধু অন্ধকার।",
+                "আমাদের গল্পটা ছিল সে-রকম—যে গল্পের শেষটা কেউ বলতে চায় না।",
+                "তুমি চলে যাবার পর থেকেই আমি থমকে গেছি—ঘড়ির কাঁটা আর এগোয় না।",
+                "যে মানুষটা আমার সবচেয়ে আপন ছিল, সে আজ সবচেয়ে দূরের মানুষ।",
+                "হারানো প্রেমের স্মৃতি রক্তক্ষরণের মতো—বন্ধ হয় না সহজে।",
+                "তোমার জন্য অপেক্ষা করতে করতে আমি ক্লান্ত, তবু অপেক্ষা থামাতে পারি না।",
+                "আমাদের ভালোবাসাটা ছিল মরীচিকার মতো—দূর থেকে সুন্দর, কাছে গেলে কিছুই নেই।",
+                "তোমাকে হারিয়ে বুঝেছি, মানুষ তার ভালোবাসার মানুষের কাছে কতটা অসহায়।",
+                "যে প্রেম ফিরে আসার নয়, সে প্রেমের জন্য অপেক্ষা করাটাই সবচেয়ে বড় পাগলামি।",
+                "আমার হৃদয় তোমার জন্য আজও কাঁদে—নিঃশব্দে, একান্তে, কারো অগোচরে।",
+                "হারানো ভালোবাসা হলো সেই বই যা পড়া শেষ হয়নি, অথচ পাতা ছিঁড়ে গেছে।",
+                "তোমার চলে যাওয়াটা ছিল অনিবার্য, কিন্তু সেটা মেনে নেওয়াটা অসম্ভব।",
+                "আমাদের প্রেমের সমাধিতে আজও ফুল রাখি—শুকনো ফুল, শুকনো স্মৃতি।",
+                "তুমি ছিলে আমার ভাগ্যের সেরা উপহার, যা ভাগ্য আমাকে বেশিদিন রাখতে দিল না।",
+                "যে ভালোবাসা হারিয়ে গেছে, সে ভালোবাসার কথা লিখতে গেলে কালি শেষ হয়ে যায়, কথা শেষ হয় না।",
+
+                // Group: Memories (~65)
+                "স্মৃতি হলো সেই পাখি যা উড়ে যায় না—মনের খাঁচায় বন্দী থাকে সারাজীবন।",
+                "তোমার স্মৃতি আমার মনের গভীরে শিকড় গেড়েছে—উপড়ে ফেলা সম্ভব নয়।",
+                "কিছু স্মৃতি আছে যা ভোলা যায় না, চাইলেও না—সেগুলো মনের অংশ হয়ে যায়।",
+                "পুরনো ছবিগুলো দেখলে আজও চোখ ভিজে আসে, কারণ প্রতিটি ছবিতে তুমি আছো।",
+                "স্মৃতি হলো সেই বৃষ্টি যা ভিজিয়ে দিয়ে যায় বারবার, শুকনো থাকতে দেয় না।",
+                "আমাদের কাটানো দিনগুলোর স্মৃতি এখন আমার একমাত্র সম্বল।",
+                "যে মুহূর্তগুলো একসঙ্গে কাটিয়েছি, সেগুলো এখন সোনালী ফ্রেমে বাঁধানো ছবি।",
+                "স্মৃতির বোঝা সবচেয়ে ভারী—কাঁধে না, মনে চাপে।",
+                "তোমার সাথে কাটানো প্রতিটি সেকেন্ড এখন অমূল্য রতন, যা হারিয়ে গেছে চিরতরে।",
+                "স্মৃতির রাস্তায় হাঁটতে গেলে পা কাঁপে, তবু হাঁটতে ইচ্ছে হয় বারবার।",
+                "আমার মনের জাদুঘরে তুমি এখনো প্রধান প্রদর্শনী—সবচেয়ে মূল্যবান স্মৃতি।",
+                "কিছু স্মৃতি আছে যা আগুন হয়ে জ্বলে—উষ্ণতা দেয়, আবার পোড়ায়ও।",
+                "তোমার গন্ধটা আজও নাকে লাগে, অথচ তুমি অনেক দূরে—এটাই স্মৃতির জাদু।",
+                "স্মৃতি হলো পুরনো ক্ষত—খুঁচালে রক্ত বেরোয়, তবু খোঁচাতে ইচ্ছে করে।",
+                "আমাদের একসঙ্গে তোলা শেষ ছবিটা আজও ফোনের গ্যালারিতে আছে—মুছতে পারিনি।",
+                "স্মৃতি কখনো মিথ্যা বলে না, সে শুধু সত্যিটা মনে করিয়ে দেয় বারবার।",
+                "তোমার দেওয়া উপহারগুলো আজও রেখে দিয়েছি—স্মৃতি হিসেবে, ভালোবাসার নিদর্শন হিসেবে।",
+                "স্মৃতি হলো মনের সিনেমা, যেখানে তুমি সবসময় নায়ক।",
+                "যে গানটা আমরা একসঙ্গে গাইতাম, আজ সেটা শুনলেই কান্না পায়।",
+                "স্মৃতি হলো মনের পিঞ্জর—যতই ভাঙতে চাই, ততই শক্ত হয়।",
+                "আমার কাছে স্মৃতিই একমাত্র সম্পদ, যা কেউ কেড়ে নিতে পারবে না।",
+                "তোমার সাথে কাটানো সন্ধ্যাগুলো এখন কবিতার মতো—পড়তে পারি, ছুঁতে পারি না।",
+                "স্মৃতি হলো মনের জমাট বরফ—গলতে চায় না, শুধু জমে থাকে।",
+                "কিছু স্মৃতি এতটাই মধুর যে সেগুলো মনে করলেই চোখ জ্বলে—মিষ্টি বিষের মতো।",
+                "তোমার হাসির স্মৃতি আমার মনের দেয়ালে স্থায়ী গ্রাফিতি হয়ে আছে।",
+                "স্মৃতির সমুদ্রে ডুব দিলে তোমাকেই খুঁজে পাই—প্রতিটি ঢেউয়ের নিচে।",
+                "আমাদের পুরনো চিঠিগুলো পড়লে আজও মনে হয়, সময় থমকে গেছে কোথাও।",
+                "স্মৃতি হলো ভূতের মতো—তাড়া করে, ছাড়ে না, অথচ দেখা যায় না।",
+                "তোমার কথা মনে পড়লে বুকের মধ্যে কেমন করে—ঠিক যেন কেউ মুঠো করে ধরে হৃদয়।",
+                "স্মৃতি কখনো পুরনো হয় না, বরং সময়ের সাথে আরও উজ্জ্বল হয়—আগুনের মতো।",
+                "আমার ফোনের মেসেজ বক্সে তোমার নামটা আজও আছে—শেষ কথা বলার স্মৃতি।",
+                "স্মৃতি হলো সেই মেঘ যা বৃষ্টি হয়ে ঝরে—চোখের জলের মাধ্যমে।",
+                "তোমার সাথে কাটানো প্রতিটি ভোর এখন স্মৃতির সোনালী আলো।",
+                "স্মৃতি আমাকে বাঁচিয়ে রেখেছে, আবার মেরেও ফেলছে ধীরে ধীরে।",
+                "কিছু জায়গা আছে যেখানে গেলেই তোমার কথা মনে পড়ে—সেখান থেকে দূরে থাকি তাই।",
+                "স্মৃতি হলো বদ্ধ ঘরের জানালা—খুলতে চাই না, অথচ বন্ধও রাখতে পারি না।",
+                "তোমার দেওয়া ভালোবাসার স্মৃতি আমার একমাত্র পাথেয়—পথ চলার রসদ।",
+                "স্মৃতির বাগানে তোমার নামের ফুল আজও ফোটে—শুকনো, কিন্তু সুগন্ধি ছড়ায়।",
+                "যে ক্যাফেতে আমরা প্রথম দেখা করেছিলাম, সেখানে গেলে আজও তোমার ছায়া দেখতে পাই।",
+                "স্মৃতি হলো সেই গল্প যা কাউকে বলা যায় না—শুধু নিজের কাছে নিজেই বলি।",
+                "তোমার স্পর্শের স্মৃতি আজও আমার ত্বকে লেগে আছে—ধুয়ে ফেলা যায়নি।",
+                "স্মৃতি কখনো ক্ষমা করে না—যা ঘটেছে, তা ভোলার নয়, বরং বয়ে বেড়ানোর।",
+                "আমাদের পুরনো বাড়িটার কথা মনে পড়লে মনটা হাহাকার করে ওঠে।",
+                "স্মৃতি হলো আয়না—যতই ভাঙি, ততই প্রতিচ্ছবি বাড়ে।",
+                "তোমার কণ্ঠের স্মৃতি আমার কানে বাজে সারাক্ষণ—মধুর ধ্বনির মতো।",
+                "স্মৃতি হলো সেই আগুন যা নেভে না—জ্বলতে থাকে অনন্তকাল।",
+                "আমার ডায়েরির পাতায় তোমার নাম আজও আছে—মুছতে পারিনি, চেষ্টাও করিনি।",
+                "স্মৃতি মানুষকে বাঁচায়, আবার মেরেও ফেলে—দুটোই একসঙ্গে করে।",
+                "তোমার চোখের রঙ আজও মনে আছে—স্মৃতি এমনিতেই থেকে যায়।",
+                "স্মৃতি হলো রাতের আকাশ—যত তারা, তত স্মৃতি—গোনা শেষ হয় না।",
+                "আমাদের একসঙ্গে যাওয়া শেষ ট্রিপের স্মৃতি এখন শুধু ছবিতে বন্দী।",
+                "স্মৃতি হলো মনের ভিতরের ঘর—যেখানে তুমি এখনো বাস করো।",
+                "তোমার জন্মদিনের স্মৃতি প্রতি বছর ফিরে আসে—তুমি আসো না, শুধু স্মৃতি আসে।",
+                "স্মৃতি হলো নদীর স্রোত—ভাসিয়ে নিয়ে যায়, তবু কিছু পাথর থেকে যায় তলানিতে।",
+                "কিছু স্মৃতি আছে যা কখনো বলতে পারি না—লজ্জায়, কষ্টে, অথবা ভালোবাসায়।",
+                "স্মৃতি হলো পুরনো ক্ষত—শুকিয়েছে, কিন্তু দাগ রয়ে গেছে।",
+                "তোমার সাথে কাটানো সময়টা এখন স্বপ্নের মতো মনে হয়—অপূর্ব, কিন্তু অবাস্তব।",
+                "স্মৃতি হলো মনের জাদু—অতীতকে বর্তমানে নিয়ে আসে।",
+                "আমার জীবনের শ্রেষ্ঠ স্মৃতিগুলোতে তুমি আছো—আর সবচেয়ে খারাপ স্মৃতিগুলোতেও তুমি।",
+                "স্মৃতি হলো সেই বীজ যা মনের মাটিতে অঙ্কুরিত হয়—কখনো ফুল হয়, কখনো কাঁটা।",
+                "তোমার স্মৃতি আমার জন্য আশীর্বাদও, অভিশাপও—দুটোই সমান।",
+                "স্মৃতি হলো অদৃশ্য শিকল—দেখা যায় না, কিন্তু বাঁধা পড়ে আছি।",
+                "আমার মনের ক্যামেরায় তোলা তোমার ছবি কখনো ফিকে হবে না।",
+                "স্মৃতি হলো শেষ ঠিকানা—যেখানে সবাই একদিন পৌঁছায়, কিছু স্মৃতি হয়ে।",
+
+                // Group: Loneliness (~65)
+                "একাকিত্ব কোনো অভিশাপ নয়, বরং তা আত্মার সাথে পরিচিত হওয়ার সুযোগ।",
+                "ভিড়ের মধ্যেও আমি একা—এটাই নিঃসঙ্গতার সবচেয়ে বড় সংজ্ঞা।",
+                "একা থাকা আর নিঃসঙ্গ থাকা এক নয়—একা থাকা পছন্দ, নিঃসঙ্গতা অভিশাপ।",
+                "রাতের নীরবতায় আমি আমার প্রতিধ্বনি শুনতে পাই—সেটাই আমার একমাত্র সঙ্গী।",
+                "নিঃসঙ্গতা হলো সেই বৃষ্টি যা শুধু আমার ওপরেই পড়ে—আর কেউ ভেজে না।",
+                "তোমার চলে যাওয়ার পর থেকে আমি আর আমি নেই—একটা নিঃসঙ্গ ছায়া হয়ে গেছি।",
+                "একাকিত্বের সাথে বন্ধুত্ব করতে শিখেছি—সে-ই এখন আমার সবচেয়ে বিশ্বস্ত সঙ্গী।",
+                "নিঃসঙ্গতা মানে খালি ঘরে প্রতিধ্বনি শোনা—নিজের কণ্ঠস্বরও অচেনা লাগে।",
+                "আমার চারপাশে মানুষ আছে, তবু আমি একা—কারণ কেউ আমার মনের ভাষা বোঝে না।",
+                "নিঃসঙ্গতা সেই আগুন যা ভেতর থেকে পোড়ায়—বাইরে কেউ টের পায় না।",
+                "একা বসে আকাশ দেখি—তারা গুনি, সময় কাটে, তবু একাকিত্ব কাটে না।",
+                "নিঃসঙ্গতা হলো সাগরের গভীরতা—উপর থেকে শান্ত, নিচে অস্থির।",
+                "আমার পৃথিবীতে এখন শুধু আমি আর আমার ছায়া—মাঝে মাঝে ছায়াটাও হারিয়ে যায়।",
+                "একাকিত্বের সাথে মানিয়ে নিতে নিতে আমি নিজেই বদলে গেছি—আগের মানুষটা নেই।",
+                "নিঃসঙ্গ রাতে তারা গুনতে গুনতে ভোর হয়ে যায়—এটাই এখন আমার রুটিন।",
+                "নিঃসঙ্গতা হলো মনের সেই অবস্থা যখন আত্মা কাঁদে, কিন্তু মুখ হাসে।",
+                "আমার ফোনের কন্টাক্ট লিস্টে অনেক নাম, কিন্তু কথা বলার মতো কেউ নেই।",
+                "একাকিত্ব শেখায়, মানুষ আসলে কতটা অসহায়—এবং কতটা শক্তিশালীও।",
+                "নিঃসঙ্গতার রং ধূসর—না সাদা, না কালো, শুধুই ধূসর বিষণ্ণতা।",
+                "আমার ঘরের দেয়ালগুলো আমার সাক্ষী—তারা জানে আমি কতটা একা।",
+                "একাকিত্বের সবচেয়ে বড় শিক্ষা হলো—নিজেকে ভালোবাসতে শেখা।",
+                "নিঃসঙ্গতা আমাকে গ্রাস করছে ধীরে ধীরে—ঠিক যেন কোয়িকস্যান্ড।",
+                "মানুষের ভিড়ে থেকেও আমি দ্বীপের মতো—চারপাশে জল, তবু একা।",
+                "একাকিত্বের সাথে যুদ্ধ করে ক্লান্ত—এখন আত্মসমর্পণ করার সময় এসেছে।",
+                "নিঃসঙ্গতার গান আমি একাই গাই—সুরও আমি, শ্রোতাও আমি।",
+                "আমার নিঃসঙ্গতা এতটাই গভীর যে সেখানে ডুব দিলে তল পাওয়া যায় না।",
+                "একাকিত্ব মানে শুধু একা থাকা নয়, বরং কারো প্রয়োজন অনুভব না করা।",
+                "নিঃসঙ্গতার মরুভূমিতে আমি একা হাঁটছি—মরীচিকা দেখে ভুল করি বারবার।",
+                "আমার জীবনের সবচেয়ে বড় সঙ্গী এখন আমার একাকিত্ব—সে কখনো ছাড়ে না।",
+                "নিঃসঙ্গতা হলো অদৃশ্য দেয়াল—দেখা যায় না, কিন্তু সবসময় ঘিরে রাখে।",
+                "একা থাকতে থাকতে আমি নিজের সেরা বন্ধু হয়ে গেছি—আর কেউ নেই তো।",
+                "নিঃসঙ্গতার বোঝা কাঁধে নিয়ে হাঁটছি—পথ শেষ হয় না, বোঝাও কমে না।",
+                "আমার মনের ঘরে এখন শুধু নীরবতা—কথা বলার মতো কেউ নেই।",
+                "একাকিত্ব হলো সেই বৃষ্টি যা ভিজিয়েও শুকনো রাখে—অদ্ভুত অনুভূতি।",
+                "নিঃসঙ্গতা কখনো কখনো আশীর্বাদ—নিজেকে চেনার সুযোগ দেয়।",
+                "আমার প্রতিচ্ছবি ছাড়া আর কেউ নেই—সেই প্রতিচ্ছবিও মাঝে মাঝে মুখ ফিরিয়ে নেয়।",
+                "নিঃসঙ্গতার সাগরে সাঁতার কাটতে কাটতে ক্লান্ত—তীরে উঠতে চাই, কিন্তু তীর নেই।",
+                "একাকিত্বের সাথে রাত কাটে—সে আমার পাশে শোয়, ঘুম পাড়ায়।",
+                "নিঃসঙ্গতা আমার আত্মার ছায়া—আলোতে দেখা যায় না, অন্ধকারে প্রকট হয়।",
+                "আমার কান্নার শব্দ কেউ শোনে না—কারণ আমার নিঃসঙ্গতা বধির।",
+                "একাকিত্ব আমাকে পোড়ায়, আবার আমাকেই আলো দেয়—দুটোই করে।",
+                "নিঃসঙ্গতা মানে আকাশের দিকে তাকিয়ে তারা না দেখা—শুধু অন্ধকার দেখা।",
+                "আমার জীবনের গল্পে এখন শুধু একটিই চরিত্র—আমি নিজেই।",
+                "একাকিত্বের মরসুমে প্রেমের ফুল ফোটে না—শুধু ক্যাকটাস জন্মায়।",
+                "নিঃসঙ্গতা হলো ঘড়ির কাঁটার শব্দ—প্রতি সেকেন্ড মনে করিয়ে দেয় আমি একা।",
+                "আমার নিঃসঙ্গতা এতটাই প্রবল যে সেটা আমার পরিচয় হয়ে গেছে।",
+                "একাকিত্বের সাথে লড়াই না করে, তাকে আলিঙ্গন করেছি—সে-ই এখন আমার আশ্রয়।",
+                "নিঃসঙ্গতার অন্ধকারে আমি হারিয়ে যাই—নিজেকে আর খুঁজে পাই না।",
+                "আমার চারপাশের পৃথিবী কোলাহলে ভরা, অথচ আমি নীরব—কারণ ভেতরটা ফাঁকা।",
+                "একাকিত্ব হলো সেই গহ্বর যা প্রতিদিন গভীরতর হয়।",
+                "নিঃসঙ্গতার ভাষা কেউ বোঝে না—সেটা শুধু অনুভব করা যায়।",
+                "আমি আমার একাকিত্বকে ভালোবাসতে শিখেছি—কারণ সেটাই আমার একমাত্র স্থায়ী সঙ্গী।",
+                "নিঃসঙ্গতা আমাকে গড়েছে, আবার ভেঙেছেও—দুটোই সমান তালে।",
+                "একা বসে চা খাই—প্রতিটি চুমুকে তোমার অভাব টের পাই।",
+                "নিঃসঙ্গতা হলো বদ্ধ ঘরের সঙ্গীত—শুধু আমি শুনতে পাই।",
+                "আমার নিঃসঙ্গতার কোনো শেষ নেই—এটা অসীম, মহাবিশ্বের মতো।",
+                "একাকিত্বের সত্যিটা হলো—আমরা সবাই একা, শুধু কেউ বুঝতে পারে, কেউ পারে না।",
+                "নিঃসঙ্গতা আমাকে দিয়েছে ধৈর্য, দিয়েছে কষ্ট, দিয়েছে বোঝার ক্ষমতা।",
+                "আমার একাকিত্বের রাতগুলো দীর্ঘ—ভোর হতে চায় না কিছুতেই।",
+                "নিঃসঙ্গতা হলো সেই আয়না যেখানে নিজেকে সবচেয়ে পরিষ্কার দেখতে পাই।",
+                "একাকিত্বের সাথে বাস করতে করতে আমি নিঃসঙ্গতার কবি হয়ে গেছি।",
+                "নিঃসঙ্গতার মেঘ কেটে গেলে যে আলো আসে, সেটা অন্যরকম—গাঢ়, পরিণত।",
+                "আমার একাকিত্ব এখন আমার শক্তি—এটা আমাকে ভাঙতে পারেনি, বরং গড়েছে।",
+
+                // Group: Silence (~55)
+                "নীরবতাই সবচেয়ে বড় উত্তর—যেখানে শব্দ ব্যর্থ হয়, সেখানে নীরবতা জয়ী হয়।",
+                "তোমার নীরবতা আমার কাছে চিৎকারের চেয়েও বেশি কিছু বলে গেছে।",
+                "নীরবতা হলো আত্মার ভাষা—যা শুধু অনুভব করা যায়, শোনা যায় না।",
+                "কথার মাঝে যে নীরবতা থাকে, সেটাই সবচেয়ে বেশি অর্থবহ।",
+                "নীরব থাকতে শিখেছি—কারণ কথা বলেও লাভ নেই, যখন শোনার কেউ নেই।",
+                "তোমার চোখের নীরবতা আমার হৃদয়কে চূর্ণ-বিচূর্ণ করে দিয়েছে।",
+                "নীরবতা কখনো কখনো সবচেয়ে জোরে কথা বলে—শুধু শোনার মতো কান থাকা চাই।",
+                "আমার নীরবতা যেন তোমার কাছে পৌঁছায়—এই প্রার্থনা করি প্রতিদিন।",
+                "নীরবতার সুর সবচেয়ে গাঢ়—কারণ তাতে মেশানো থাকে অশ্রুর লবণ।",
+                "যে কথা বলা যায় না, সে কথাই নীরবতা হয়ে থেকে যায়—চিরদিনের জন্য।",
+                "নীরবতা হলো মনের গভীরতম অভিব্যক্তি—যেখানে ভাষা হেরে যায়।",
+                "তোমার অনুপস্থিতির নীরবতা আমার কানে বাজে সারাক্ষণ।",
+                "নীরবতা এতটাই জোরে কথা বলে যে মাঝে মাঝে কান ঢাকতে ইচ্ছে করে।",
+                "আমার নীরবতা আমার সবচেয়ে বড় অস্ত্র—এবং সবচেয়ে বড় দুর্বলতাও।",
+                "নীরব থাকা মানে কিছু বলা নয়, বরং অনেক কিছু চেপে রাখা।",
+                "তোমার সাথে আমার শেষ কথোপকথনটা ছিল নীরবতা—কেউ কিছু বলিনি, তবু সব বলা হয়ে গেছে।",
+                "নীরবতার মধ্যে যে শক্তি আছে, তা শব্দের মধ্যে নেই।",
+                "আমার নীরবতা যেন তোমার কানে পৌঁছে দেয় আমার না-বলা কষ্টগুলো।",
+                "নীরবতা হলো সেই সমুদ্র যার গভীরতা মাপা যায় না।",
+                "তোমার নীরবতা আমাকে প্রতিদিন হত্যা করে—ধীরে ধীরে, নিঃশব্দে।",
+                "নীরবতার রঙ কালো—সবকিছু গিলে নেয়, কিছুই ফেরত দেয় না।",
+                "আমি নীরব—কারণ আমার কষ্টের ভাষা এখনো আবিষ্কৃত হয়নি।",
+                "নীরবতা হলো ভালোবাসার শেষ স্তর—যখন আর কিছু বলার থাকে না।",
+                "তোমার নীরবতার চেয়ে তোমার কান্না শুনতে বেশি ভালো লাগত—অন্তত কিছু শুনতে পেতাম।",
+                "নীরবতা সব প্রশ্নের উত্তর দেয় না, কিন্তু সব প্রশ্নের অবসান ঘটায়।",
+                "আমার হৃদয়ের নীরবতা তুমি কি কখনো শুনতে পেয়েছো?",
+                "নীরবতা হলো আত্মার আয়না—নিজেকে সবচেয়ে স্পষ্ট দেখায়।",
+                "তোমার ঠোঁটের নীরবতা আমার কপালে লেখা—চিরস্থায়ী দাগ।",
+                "নীরবতার শব্দ সবচেয়ে ভয়ংকর—কারণ সেটা কখনো থামে না।",
+                "আমার নীরবতা তুমি পড়তে পারোনি—তাই আমাদের গল্প অসম্পূর্ণ রয়ে গেল।",
+                "নীরবতা হলো সেই গান যা গাওয়া হয় না—শুধু বাজে মনের ভেতর।",
+                "তোমার নীরবতার মানে আমি বুঝতে পেরেছি—তুমি আর আমার নও।",
+                "নীরবতা হলো ভালোবাসার কবর—যেখানে শব্দগুলো ঘুমিয়ে থাকে।",
+                "আমার জীবনের প্রতিটি নীরব মুহূর্তে তুমি আছো—অদৃশ্য অতিথি হয়ে।",
+                "নীরবতার সুরে আমি তোমার নাম শুনতে পাই—মিষ্টি, কিন্তু বিষাদময়।",
+                "তোমার চোখ যে নীরবতা বহন করে, সেটা আমি পড়তে পারি—পড়তে গিয়ে কাঁদি।",
+                "নীরবতা হলো সম্পর্কের শেষ চিহ্ন—তারপর শুধুই শূন্যতা।",
+                "আমার মনের নীরবতায় তুমি বাস করো—কেউ জানে না, শুধু আমি জানি।",
+                "নীরবতা যখন কথা বলে, তখন পৃথিবী থমকে যায়—শোনার জন্য।",
+                "তোমার নীরবতা আমার জন্য মৃত্যু পরোয়ানা—প্রতিদিন নতুন করে মরি।",
+                "নীরবতার গভীরে ডুব দিলে নিজের প্রতিচ্ছবি দেখতে পাই—ভাঙা, অসম্পূর্ণ।",
+                "আমার চিৎকারও নীরব—কারণ শোনার কেউ নেই।",
+                "নীরবতা হলো প্রেমের শেষ ভাষা—যখন সব কথা ফুরিয়ে যায়।",
+                "তোমার নীরবতার বেড়াজালে আমি বন্দী—ছাড়া পেতে চাই, কিন্তু পারি না।",
+                "নীরবতার মাধুর্য আমি বুঝেছি অনেক দেরিতে—যখন শব্দের মূল্য শেষ।",
+                "আমার নীরবতার ভেতর লুকানো আছে হাজারো কথা—যা কখনো বলতে পারিনি।",
+                "নীরবতা হলো অদৃশ্য সাঁকো—যা দুটি হৃদয়কে যুক্ত করে, অথচ দেখা যায় না।",
+                "তোমার নীরবতার শব্দে আমি বধির হয়ে যাচ্ছি ধীরে ধীরে।",
+                "নীরবতা আমাকে শিখিয়েছে—কিছু কথা না বলাই ভালো, কিছু অনুভূতি লুকানোই ভালো।",
+                "আমার জীবনের সবচেয়ে বড় নীরবতা হলো তুমি—যাকে ভালোবেসেও কিছু বলতে পারিনি।",
+                "নীরবতার রাতে আমি জেগে থাকি—আর তোমার অভাব গুনি।",
+                "তোমার নীরবতা আমার সব প্রশ্নের উত্তর—যদিও উত্তরটা কষ্টের।",
+                "নীরবতা হলো শেষ অধ্যায়—যেখানে লেখা থাকে না কিছুই, শুধু অনুভব করা যায়।",
+
+                // Group: Hope (~50)
+                "প্রতিটি অন্ধকার রাতের শেষে সূর্য ওঠে—এই বিশ্বাসই আমার বেঁচে থাকার রসদ।",
+                "আশা হলো সেই আলো যা অন্ধকারেও জ্বলে—নেভে না কখনো।",
+                "হারানো সবকিছু ফিরে না এলেও, নতুন কিছু আসবে—এই আশাতেই বাঁচি।",
+                "আশাই জীবন—আশা ছাড়া মানুষ বাঁচতে পারে না, শুধু টিকে থাকতে পারে।",
+                "আজকের কষ্ট কালকের গল্প হবে—এই ভেবে নিজেকে সান্ত্বনা দিই।",
+                "ভোরের আলো আসবেই—যত ঘন অন্ধকারই হোক না কেন।",
+                "আশা হলো মনের সেই জানালা যা কখনো বন্ধ হয় না—সবসময় আলো আসে।",
+                "জীবনে যতবার পড়েছি, ততবার উঠেছি—কারণ আশা ছাড়িনি কখনো।",
+                "আগামীকাল ভালো হবে—এই একটি বাক্যই আমাকে বাঁচিয়ে রেখেছে এতদিন।",
+                "আশা হলো সেই নোঙর যা ঝড়ের মধ্যেও জাহাজকে স্থির রাখে।",
+                "চোখের জলের পরেই রামধনু আসে—এটাই প্রকৃতির নিয়ম, এটাই আশা।",
+                "আমার হৃদয়ে এখনো আশার প্রদীপ জ্বলে—নিভাতে চাই না কখনো।",
+                "যে মানুষ আশা ছাড়ে না, সে কখনো হারে না—হয়তো দেরিতে জেতে, কিন্তু জেতে।",
+                "আশা হলো বীজ—মনের মাটিতে পুঁতে রাখলে একদিন অঙ্কুরিত হয়ই।",
+                "অন্ধকার যত গাঢ় হয়, ভোর তত কাছে—এই সত্য ভুলতে পারি না।",
+                "আশাই আমাকে প্রতিদিন বিছানা ছেড়ে উঠতে বাধ্য করে—নতুন দিনের প্রত্যাশায়।",
+                "জীবনের সবচেয়ে বড় শক্তি হলো আশা—যা পাহাড়ও সরাতে পারে।",
+                "আজ যদি কিছুই ভালো না হয়, কাল হবে—এই প্রত্যাশাই তো বাঁচার মন্ত্র।",
+                "আশা হলো নক্ষত্র—অন্ধকার রাতে পথ দেখায়।",
+                "যে স্বপ্ন দেখা ছাড়েনি, সে এখনো বেঁচে আছে—মরেনি।",
+                "আশা মানে অসম্ভবকে সম্ভব করার সাহস—যা প্রতিটি মানুষের থাকে।",
+                "আমার চোখে এখনো স্বপ্ন আছে—সেটাই আশার শেষ ঠিকানা।",
+                "ভালো সময় আসবেই—হয়তো দেরিতে, কিন্তু আসবেই।",
+                "আশা হলো সেই সুর যা বিষণ্ণ মনের মধ্যেও বেজে চলে।",
+                "প্রতিটি শেষ মানেই নতুন শুরু—এটাই আশার সবচেয়ে বড় সত্য।",
+                "আমার হৃদয়ের প্রতিটি স্পন্দন বলে—আশা আছে, বেঁচে থাকো।",
+                "আশা হলো মোমবাতির শিখা—ঝড়েও নেভে না, যদি জ্বালিয়ে রাখার ইচ্ছা থাকে।",
+                "যত কষ্টই হোক, সকাল আসবেই—এই বিশ্বাস আমার ধর্ম।",
+                "আশা না থাকলে জীবন মানে শুধু শ্বাস নেওয়া—বেঁচে থাকা নয়।",
+                "আমার কাছে আশাই ঈশ্বর—কারণ আশাই আমাকে বাঁচিয়েছে বারবার।",
+                "কালকের সূর্য আজকের চেয়ে বেশি উজ্জ্বল হবে—এই প্রত্যাশায় বাঁচি।",
+                "আশা হলো সেই দড়ি যা অন্ধকার কূপ থেকে টেনে তোলে।",
+                "জীবনে যতবার ভেঙেছি, ততবার গড়েছি—কারণ আশা ছাড়িনি।",
+                "আশার পালে হাওয়া লাগলে নৌকা চলবেই—যতই প্রতিকূল স্রোত হোক।",
+                "আমার মনের আকাশে এখনো তারার মতো আশা জ্বলে—মিটিমিটি করে।",
+                "আশা হলো সেই ওষুধ যা কোনো ফার্মেসিতে বিক্রি হয় না, তবু সবচেয়ে কার্যকরী।",
+                "প্রতিটি পতনই নতুন করে ওঠার সুযোগ—এই শিক্ষা আশা দিয়েছে আমাকে।",
+                "আশা ছাড়া মানুষ পাথরের মতো—অনড়, প্রাণহীন।",
+                "আমার জীবনের প্রতিটি অন্ধকার রাতে আশাই ছিল আমার চাঁদ।",
+                "আগামীকালের জন্য একটু আশা রেখে ঘুমাতে যাই—সেটাই যথেষ্ট।",
+                "আশা হলো জীবনের জ্বালানি—যা ছাড়া গাড়ি চলে না।",
+                "যে আশা করে, সে কখনো একা নয়—কারণ আশা তার সঙ্গী।",
+                "আমার চোখের জলের নিচেও আশার বীজ লুকানো—একদিন ফুটবেই।",
+                "আশা হলো হৃদয়ের ডানা—যা উড়তে সাহায্য করে।",
+                "জীবনের শেষ মুহূর্ত পর্যন্ত আশা রাখো—কারণ অলৌকিক ঘটনা ঘটেই।",
+                "আশাই আমাকে শিখিয়েছে—অন্ধকারের পরেই আলো আসে, এটাই নিয়ম।",
+                "আমার প্রতিটি নিঃশ্বাসে আশা মিশে আছে—নইলে নিঃশ্বাস নিতাম না।",
+                "আশা হলো সেই সম্পদ যা কেউ চুরি করতে পারে না।",
+                "ভেঙে পড়ো, কিন্তু আশা ছেড়ো না—কারণ আশাই তোমাকে আবার গড়বে।",
+
+                // Group: Healing (~50)
+                "ক্ষত শুকাতে সময় লাগে—তাড়াহুড়া করো না, ধৈর্য ধরো।",
+                "নিজেকে ভালোবাসতে শেখাটাই সবচেয়ে বড় নিরাময়।",
+                "যে হৃদয় ভেঙেছে, সেটা সারাতে হলে আগে নিজেকে সময় দিতে হবে।",
+                "নিরাময় মানে ভুলে যাওয়া নয়, বরং মেনে নিয়ে এগিয়ে যাওয়া।",
+                "প্রতিদিন একটু একটু করে সেরে উঠছি—আয়নায় নিজেকে দেখে বোঝা যায়।",
+                "ক্ষত থেকে শিক্ষা নাও—সেটাই সবচেয়ে ভালো ওষুধ।",
+                "যন্ত্রণাকে আলিঙ্গন করো—তবেই সেটা কমবে।",
+                "নিজের সাথে সৎ থাকো—নিরাময়ের এটাই প্রথম ধাপ।",
+                "সময় সব ক্ষত সারায় না, কিন্তু অনেকটাই সহনীয় করে তোলে।",
+                "নিরাময় হলো ধীরগতির প্রক্রিয়া—তাড়াহুড়ো করলে উল্টো ক্ষতি হবে।",
+                "আমার হৃদয়ের ক্ষত এখন শুকনো—রক্ত পড়া বন্ধ হয়েছে, দাগ রয়ে গেছে।",
+                "যে কষ্ট পেয়েছে, সে-ই জানে নিরাময়ের মূল্য।",
+                "নিজেকে ক্ষমা করতে শিখেছি—সেটাই সবচেয়ে বড় নিরাময়।",
+                "ক্ষত আমাকে শক্তিশালী করেছে—আগের চেয়ে অনেক বেশি।",
+                "নিরাময়ের পথে হাঁটছি—গন্তব্য এখনো দূরে, কিন্তু পথে আছি।",
+                "যন্ত্রণা থেকে পালিও না—তার মুখোমুখি হও, তবেই সেরে উঠবে।",
+                "আমার হৃদয় এখন সুস্থ—কারণ আমি নিজেকে ভালোবাসতে শিখেছি।",
+                "নিরাময় মানে নতুন করে শুরু করা—পুরনোকে পেছনে ফেলে।",
+                "ক্ষত থেকে যে ফুল ফোটে, সেটা সবচেয়ে সুন্দর।",
+                "নিজের যত্ন নিতে শিখেছি—কারণ আমিই আমার সবচেয়ে বড় সম্পদ।",
+                "নিরাময় হলো সূর্যের আলো—ধীরে ধীরে অন্ধকার কাটে।",
+                "যে বৃষ্টি ভিজিয়েছিল, সেই বৃষ্টিই ধুয়েও দিয়েছে ক্ষত।",
+                "আমার আত্মা এখন শান্ত—অনেক ঝড়ের পর।",
+                "নিরাময়ের সঙ্গীত একান্তই নিজের—অন্য কেউ শোনাতে পারবে না।",
+                "ক্ষত আমাকে শিখিয়েছে—কীভাবে বাঁচতে হয়, কীভাবে ভালোবাসতে হয়।",
+                "নিজেকে গ্রহণ করো—ভালো-মন্দ সব মিলিয়েই তুমি।",
+                "নিরাময় হলো ফুল ফোটার মতো—সময় লাগে, কিন্তু শেষে সুন্দর হয়।",
+                "আমার হৃদয়ের বাগানে এখন নতুন ফুল ফুটছে—পুরনো ক্ষত সেরে গেছে।",
+                "যন্ত্রণা থেকে জন্ম নেয় শিল্প—আমার লেখা তার প্রমাণ।",
+                "নিরাময়ের প্রথম ধাপ হলো—স্বীকার করা যে তুমি কষ্ট পেয়েছো।",
+                "আমি এখন সুস্থ—না, পুরোপুরি না, কিন্তু আগের চেয়ে অনেক ভালো।",
+                "নিরাময় মানে অতীতকে মুছে ফেলা নয়, বরং তাকে জায়গা করে দেওয়া।",
+                "নিজের কান্নাকে সম্মান করো—সেটাও নিরাময়ের অংশ।",
+                "ক্ষত থেকে আমি শক্তি পেয়েছি—অন্য কাউকে সাহায্য করার শক্তি।",
+                "নিরাময়ের পথে একা চলতে হয়—কেউ হাত ধরবে না, নিজেকেই চলতে হবে।",
+                "আমার হৃদয় এখন প্রস্তুত—নতুন করে ভালোবাসতে, নতুন করে বাঁচতে।",
+                "নিরাময় হলো পুনর্জন্ম—নতুন করে বাঁচতে শেখা।",
+                "যন্ত্রণা কেটে গেলে যে শান্তি আসে, সেটা অমূল্য।",
+                "নিজেকে সময় দাও—নিরাময় তাড়াহুড়ো পছন্দ করে না।",
+                "আমার ক্ষত এখন আমার গল্প বলে—আর আমি সেই গল্পের নায়ক।",
+                "নিরাময়ের শেষে যে মানুষটা দাঁড়ায়, সে আগের চেয়ে অনেক শক্তিশালী।",
+                "নিজের প্রতি সদয় হও—তুমি অনেক কিছু সহ্য করেছো।",
+                "নিরাময় হলো সকালের প্রথম আলো—আস্তে আস্তে ছড়ায়, তারপর পুরো আকাশ আলোকিত করে।",
+                "আমি এখন হাসতে পারি—সেটাই নিরাময়ের সবচেয়ে বড় প্রমাণ।",
+                "ক্ষত আমাকে তৈরি করেছে—আজ আমি যা, আমার ক্ষতের জন্যই।",
+                "নিরাময় কখনো রৈখিক নয়—ওঠাপড়া থাকবে, সেটাই স্বাভাবিক।",
+                "নিজেকে ভালোবাসো—কারণ তুমিই তোমার সবচেয়ে বড় বন্ধু।",
+                "আমার হৃদয়ের সিম্ফনি এখন নতুন সুরে বাজে—পুরনো ক্ষত সেরে গেছে।",
+                "নিরাময় হলো জীবনের শ্রেষ্ঠ উপহার—যা আমরা নিজেদের দিতে পারি।",
+
+                // Group: Moving Forward (~50)
+                "অতীতকে পেছনে ফেলে এগিয়ে যাওয়াই জীবনের একমাত্র গতি।",
+                "যে পাতা ঝরে গেছে, তার জন্য কাঁদলে নতুন পাতা আসবে না।",
+                "আমি আর পেছনে ফিরে তাকাই না—সামনের দিকে চোখ রেখে চলি।",
+                "এগিয়ে যাওয়া মানে ভুলে যাওয়া নয়, বরং শিক্ষা নিয়ে চলা।",
+                "জীবনের নদী থামে না—আমাকেও থামতে হবে না।",
+                "পুরনো অধ্যায় শেষ—নতুন অধ্যায় শুরু করার সময় এসেছে।",
+                "যে দরজা বন্ধ হয়েছে, তার জন্য কাঁদলে নতুন দরজা দেখতে পাবে না।",
+                "আমার পায়ে এখন নতুন জুতা—পুরনো পথ ভুলে নতুন পথে চলব।",
+                "অতীত আমার শিক্ষক, কারাগার নয়—এই বোধ এসেছে অনেক দেরিতে।",
+                "এগিয়ে যাওয়ার সাহস সবচেয়ে বড় সাহস—যা আমি অর্জন করেছি কষ্ট করে।",
+                "আমি এখন প্রস্তুত—নতুন সূর্য দেখতে, নতুন বাতাসে শ্বাস নিতে।",
+                "যে মানুষ অতীত আঁকড়ে থাকে, সে কখনো ভবিষ্যতের স্বাদ পায় না।",
+                "আমার ডানা ভেঙেছিল, কিন্তু এখন নতুন ডানা গজিয়েছে—উড়ব আবার।",
+                "এগিয়ে যাওয়া মানে নিজের উপর বিশ্বাস রাখা—যে তুমি পারবে।",
+                "পুরনো ক্ষতের দাগ নিয়েই এগিয়ে যেতে হবে—সেটাই জীবন।",
+                "আমি আর অপেক্ষা করি না—এখন আমি চলি, নিজের পথ নিজে গড়ি।",
+                "অতীতের ভূত আমাকে আর তাড়া করতে পারে না—আমি অনেক দূরে চলে এসেছি।",
+                "এগিয়ে যাওয়ার প্রথম ধাপ—পেছনের সবকিছু মেনে নেওয়া।",
+                "আমার গল্প এখন নতুন মোড় নেবে—আমিই তার লেখক।",
+                "যে সূর্য ডুবে গেছে, তার জন্য কাঁদলে নতুন সূর্যোদয় মিস করবে।",
+                "আমি এখন চলছি—গন্তব্য জানি না, তবু চলছি, সেটাই বড় কথা।",
+                "অতীতের শিকল ভেঙে বেরিয়ে আসতে পেরেছি—এটাই আমার জয়।",
+                "এগিয়ে যাওয়া মানে সাহসী হওয়া—নিজের ভয়কে জয় করা।",
+                "আমার জীবনের নতুন অধ্যায় শুরু—পুরনো কালি শুকিয়ে গেছে।",
+                "যে মানুষ এগিয়ে যেতে পারে, সে কখনো হারতে পারে না।",
+                "আমি অতীতকে ধন্যবাদ জানাই—শেখানোর জন্য, তারপর বিদায় জানাই।",
+                "নতুন পথে পা রেখেছি—ভয় করছে, তবু চলছি।",
+                "এগিয়ে যাওয়াই একমাত্র বিকল্প—পেছনে ফেরার কোনো রাস্তা নেই।",
+                "আমার জাহাজ এখন নতুন দিগন্তে—পুরনো বন্দর ছেড়ে এসেছি।",
+                "অতীত একটি ভূত—যত তাড়াবেন, তত তাড়া করবে; উপেক্ষা করলেই মিলিয়ে যাবে।",
+                "আমি এখন মুক্ত—অতীতের শিকল ভেঙে বেরিয়ে এসেছি।",
+                "এগিয়ে যাওয়ার অর্থ এই নয় যে ভুলে যাও—অর্থ হলো শিক্ষা নিয়ে চলা।",
+                "আমার পায়ের তলায় এখন নতুন মাটি—পুরনো পথের ধুলো ঝেড়ে ফেলেছি।",
+                "যে মানুষ পেছনে তাকায় না, সে-ই সবচেয়ে দ্রুত এগোয়।",
+                "আমি আর থামব না—জীবন থেমে থাকার জন্য নয়।",
+                "অতীত আমাকে গড়েছে, কিন্তু বন্দী করতে পারেনি—আমি স্বাধীন।",
+                "এগিয়ে যাওয়ার সিদ্ধান্তই সবচেয়ে কঠিন—তারপর সব সহজ হয়ে যায়।",
+                "আমার সামনে এখন বিশাল প্রান্তর—পেছনে শুধু ধ্বংসাবশেষ।",
+                "নতুন সকালের সূর্য আমার জন্য অপেক্ষা করছে—আমি আর দেরি করব না।",
+                "এগিয়ে যাওয়া মানে নিজেকে নতুন করে চেনা—আর সেই চেনাটাই সুন্দর।",
+                "আমি এখন পথিক—গন্তব্য অনিশ্চিত, কিন্তু পথ সুন্দর।",
+                "অতীতের পৃষ্ঠা উল্টে ফেলেছি—এখন নতুন পৃষ্ঠায় নতুন গল্প লিখব।",
+                "এগিয়ে যাওয়ার কোনো বয়স নেই—যে কোনো সময় শুরু করা যায়।",
+                "আমার হৃদয় এখন হালকা—অতীতের বোঝা নামিয়ে রেখে এসেছি।",
+                "যে নদী বয়ে চলে, সে নদীই বাঁচে—স্থির জল পচে যায়।",
+                "আমি চলছি—আমার গতি ধীর, কিন্তু থামব না।",
+                "অতীতকে বিদায় জানাতে পেরেছি—এটাই আমার সবচেয়ে বড় অর্জন।",
+                "এগিয়ে যাওয়া মানে বেঁচে থাকা—থেমে যাওয়া মানে মৃত্যু।",
+                "আমার জীবনের নতুন সূর্য উঠেছে—আর আমি প্রস্তুত।",
+
+                // Group: Deep Reflections (~40)
+                "জীবন হলো নদীর মতো—বাঁক নেয়, তবু চলে; আমাকেও চলতে হবে।",
+                "ভালোবাসা পাওয়া নয়, বরং দেওয়ার নাম—এই সত্য বুঝতে অনেক সময় লেগেছে।",
+                "আমরা সবাই কোনো না কোনো গল্পের চরিত্র—কারো কাছে নায়ক, কারো কাছে খলনায়ক।",
+                "সময় সবচেয়ে বড় শিক্ষক—কিন্তু সে পরীক্ষা আগে নেয়, শিক্ষা পরে দেয়।",
+                "মানুষের জীবন মানেই ক্ষত আর নিরাময়ের চক্র—ভাঙা আর গড়ার খেলা।",
+                "জীবনের সবচেয়ে বড় সত্য হলো—কিছুই স্থায়ী নয়, সুখও নয়, দুঃখও নয়।",
+                "আমার আয়নায় আমি নিজেকে দেখি—কিন্তু সেটা কি আসল আমি?",
+                "ভালোবাসা হলো সেই আলো যা জ্বলে, নিভে যায়, আবার জ্বলে—চিরন্তন।",
+                "জীবনের অর্থ খুঁজতে গিয়ে জীবনটাই শেষ হয়ে যায়—অর্থের প্রয়োজন নেই, বেঁচে থাকাই অর্থ।",
+                "আমরা সবাই ভুল করি—ভুল থেকে শিক্ষা নেওয়াটাই আসল বুদ্ধিমানের কাজ।",
+                "জীবন একটাই—এটাকে সুন্দর করে বাঁচার দায়িত্ব আমাদের নিজেদের।",
+                "সময় কারো জন্য থামে না—এটাই জীবনের সবচেয়ে বড় সত্য, আর সবচেয়ে বড় কষ্টও।",
+                "ভালোবাসা কোনো গন্তব্য নয়, বরং যাত্রা—যেখানে প্রতিটি পদক্ষেপই মূল্যবান।",
+                "আমার গল্প আমি নিজেই লিখব—অন্য কাউকে দেওয়া হবে না কলম।",
+                "জীবন মানেই অনিশ্চয়তা—আর সেই অনিশ্চয়তাই জীবনকে সুন্দর করে।",
+                "ক্ষমা করতে শেখো—অন্যকে নয়, নিজেকে; সেটাই সবচেয়ে কঠিন।",
+                "ভালোবাসার কোনো সংজ্ঞা নেই—যার যার ভালোবাসা, তার তার সংজ্ঞা।",
+                "জীবনের সবচেয়ে বড় অর্জন—নিজেকে চেনা, নিজেকে জানা।",
+                "আমরা যা হারাই, তার মূল্য বেশি—কারণ তখন সেটা আর আমাদের থাকে না।",
+                "সময় বয়ে যায়—আমরা শুধু তীরে দাঁড়িয়ে দেখি, কিছুই করতে পারি না।",
+                "জীবন একটা ক্যানভাস—রং তোমার, তুলি তোমার, ছবিটাও তোমার।",
+                "ভালোবাসা কখনো বৃথা যায় না—তা থেকে কিছু না কিছু শেখা যায়ই।",
+                "আমার অস্তিত্বের প্রমাণ আমি নিজেই—আমার গল্পই আমার পরিচয়।",
+                "জীবনের সবচেয়ে বড় সাহস—নিজের দুর্বলতা স্বীকার করা।",
+                "ভালোবাসা মানে অধিকার নয়, বরং মুক্তি—পরস্পরকে মুক্ত রাখা।",
+                "সময় সবকিছু বদলে দেয়—এমনকি আমাকেও, তোমাকেও, আমাদেরও।",
+                "জীবন হলো থিয়েটার—আমরা সবাই অভিনেতা, কেউ জানে না স্ক্রিপ্ট কী।",
+                "ভালোবাসা হলো আগুন—উষ্ণতা দেয়, আবার পোড়ায়ও; দুটোই সমান সত্য।",
+                "আমার জীবন আমার—এর মূল্য আমি নির্ধারণ করব, অন্য কেউ নয়।",
+                "জীবনের প্রতিটি অধ্যায়ই গুরুত্বপূর্ণ—কোনোটা সুখের, কোনোটা কষ্টের, সবই প্রয়োজনীয়।",
+                "ভালোবাসা মানে শুধু পাওয়া নয়, বরং হারানোর ভয় নিয়েও ভালোবেসে যাওয়া।",
+                "জীবন একটাই—এটাকে অকারণে নষ্ট করার কোনো মানে হয় না।",
+                "আমার হৃদয় এখন জ্ঞানী—অনেক কষ্ট পেয়ে, অনেক কিছু শিখে।",
+                "জীবন মানেই পরিবর্তন—যে মানিয়ে নিতে পারে, সে-ই টিকে থাকে।",
+                "ভালোবাসা হলো সেই গল্প যা কখনো শেষ হয় না—প্রজন্ম থেকে প্রজন্মে চলে।",
+                "সময়ের চেয়ে বড় ডাক্তার কেউ নেই—সে সব ক্ষত সারাতে জানে।",
+                "জীবনের সেরা শিক্ষা—যা পেয়েছো, তার মূল্য দাও; যা হারিয়েছো, তা ছেড়ে দাও।",
+                "আমার জীবন আমার গুরু—আমি তার ছাত্র, প্রতিদিন নতুন কিছু শিখছি।",
+                "ভালোবাসা শেষ হয় না—রূপ বদলায়, কিন্তু থেকে যায়।",
+                "জীবন সুন্দর—হ্যাঁ, কষ্টের মধ্যেও; শুধু দেখার চোখ থাকা চাই।"
+            ];
+
+            // ──────────────────────────────────────
+            // APP STATE
+            // ──────────────────────────────────────
+            const totalCaptions = captions.length;
+            let currentPage = 0;
+            let fontSizeLevel = 2; // 0=small, 1=medium-small, 2=default, 3=large, 4=xlarge
+            const fontSizeValues = ['1rem', '1.2rem', '1.35rem', '1.55rem', '1.75rem'];
+            const lineHeightValues = ['1.7', '1.9', '2.1', '2.3', '2.5'];
+            let isDarkMode = true;
+            let favorites = [];
+            let autoHideTimer = null;
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchMoved = false;
+            let isSwiping = false;
+            let swipeThreshold = 50;
+
+            // ──────────────────────────────────────
+            // DOM REFS
+            // ──────────────────────────────────────
+            const loadingScreen = document.getElementById('loading-screen');
+            const appContainer = document.getElementById('app-container');
+            const topBar = document.getElementById('top-bar');
+            const bottomNav = document.getElementById('bottom-nav');
+            const captionCard = document.getElementById('caption-card');
+            const captionText = document.getElementById('caption-text');
+            const pageIndicator = document.getElementById('page-indicator');
+            const progressFill = document.getElementById('progress-bar-fill');
+            const searchOverlay = document.getElementById('search-overlay');
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+            const favoritesPanel = document.getElementById('favorites-panel');
+            const favoritesList = document.getElementById('favorites-list');
+            const toast = document.getElementById('toast');
+            const btnFav = document.getElementById('btn-fav');
+
+            // ──────────────────────────────────────
+            // INIT
+            // ──────────────────────────────────────
+            function init() {
+                loadFromStorage();
+                updateCaptionDisplay();
+                updatePageIndicator();
+                updateProgressBar();
+                updateFavButton();
+                applyFontSize();
+                applyTheme();
+                setupEventListeners();
+                // Hide loading screen
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                }, 800);
+            }
+
+            function loadFromStorage() {
+                try {
+                    const saved = localStorage.getItem('odrishya_maya_page');
+                    if (saved !== null) {
+                        const p = parseInt(saved);
+                        if (!isNaN(p) && p >= 0 && p < totalCaptions) {
+                            currentPage = p;
+                        }
+                    }
+                    const savedFavs = localStorage.getItem('odrishya_maya_favorites');
+                    if (savedFavs) {
+                        favorites = JSON.parse(savedFavs);
+                        if (!Array.isArray(favorites)) favorites = [];
+                    }
+                    const savedFont = localStorage.getItem('odrishya_maya_font');
+                    if (savedFont !== null) {
+                        const f = parseInt(savedFont);
+                        if (!isNaN(f) && f >= 0 && f <= 4) fontSizeLevel = f;
+                    }
+                    const savedTheme = localStorage.getItem('odrishya_maya_theme');
+                    if (savedTheme === 'light') isDarkMode = false;
+                } catch (e) {
+                    // ignore
+                }
+            }
+
+            function saveToStorage() {
+                try {
+                    localStorage.setItem('odrishya_maya_page', currentPage);
+                    localStorage.setItem('odrishya_maya_favorites', JSON.stringify(favorites));
+                    localStorage.setItem('odrishya_maya_font', fontSizeLevel);
+                    localStorage.setItem('odrishya_maya_theme', isDarkMode ? 'dark' : 'light');
+                } catch (e) {
+                    // ignore
+                }
+            }
+
+            // ──────────────────────────────────────
+            // UI UPDATES
+            // ──────────────────────────────────────
+            function updateCaptionDisplay(animationClass = '') {
+                captionText.textContent = captions[currentPage];
+                if (animationClass) {
+                    captionCard.classList.add(animationClass);
+                    setTimeout(() => {
+                        captionCard.classList.remove(animationClass);
+                    }, 460);
+                }
+                updateFavButton();
+                updatePageIndicator();
+                updateProgressBar();
+                saveToStorage();
+                // Update card accent
+                if (favorites.includes(currentPage)) {
+                    captionCard.classList.add('favorited');
+                } else {
+                    captionCard.classList.remove('favorited');
+                }
+            }
+
+            function updatePageIndicator() {
+                pageIndicator.textContent = `${currentPage + 1} / ${totalCaptions}`;
+            }
+
+            function updateProgressBar() {
+                const pct = ((currentPage + 1) / totalCaptions) * 100;
+                progressFill.style.width = pct + '%';
+            }
+
+            function updateFavButton() {
+                if (favorites.includes(currentPage)) {
+                    btnFav.textContent = '❤️';
+                    btnFav.classList.add('accent-btn');
+                } else {
+                    btnFav.textContent = '♡';
+                    btnFav.classList.remove('accent-btn');
+                }
+            }
+
+            function applyFontSize() {
+                captionText.style.fontSize = fontSizeValues[fontSizeLevel];
+                captionText.style.lineHeight = lineHeightValues[fontSizeLevel];
+            }
+
+            function applyTheme() {
+                if (isDarkMode) {
+                    document.body.classList.remove('light-mode');
+                } else {
+                    document.body.classList.add('light-mode');
+                }
+            }
+
+            function showToast(msg) {
+                toast.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 1800);
+            }
+
+            // ──────────────────────────────────────
+            // NAVIGATION
+            // ──────────────────────────────────────
+            function goToPage(index, animationClass = '') {
+                if (index < 0 || index >= totalCaptions) return;
+                if (index === currentPage) return;
+                currentPage = index;
+                updateCaptionDisplay(animationClass);
+            }
+
+            function nextPage() {
+                if (currentPage < totalCaptions - 1) {
+                    goToPage(currentPage + 1, 'page-turn-next');
+                } else {
+                    showToast('এটাই শেষ পৃষ্ঠা 📖');
+                }
+            }
+
+            function prevPage() {
+                if (currentPage > 0) {
+                    goToPage(currentPage - 1, 'page-turn-prev');
+                } else {
+                    showToast('এটাই প্রথম পৃষ্ঠা 📖');
+                }
+            }
+
+            function randomPage() {
+                let newPage;
+                do {
+                    newPage = Math.floor(Math.random() * totalCaptions);
+                } while (newPage === currentPage && totalCaptions > 1);
+                goToPage(newPage, 'page-turn-next');
+            }
+
+            function toggleFavorite() {
+                const idx = favorites.indexOf(currentPage);
+                if (idx > -1) {
+                    favorites.splice(idx, 1);
+                    showToast('প্রিয় থেকে সরানো হয়েছে 💔');
+                } else {
+                    favorites.push(currentPage);
+                    showToast('প্রিয়তে যোগ করা হয়েছে ❤️');
+                }
+                updateFavButton();
+                if (favorites.includes(currentPage)) {
+                    captionCard.classList.add('favorited');
+                } else {
+                    captionCard.classList.remove('favorited');
+                }
+                saveToStorage();
+            }
+
+            function copyCaption() {
+                const text = captions[currentPage];
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast('কপি করা হয়েছে ✅');
+                    }).catch(() => {
+                        fallbackCopy(text);
+                    });
+                } else {
+                    fallbackCopy(text);
+                }
+            }
+
+            function fallbackCopy(text) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                ta.style.top = '-9999px';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('কপি করা হয়েছে ✅');
+                } catch (e) {
+                    showToast('কপি করা যায়নি 😕');
+                }
+                document.body.removeChild(ta);
+            }
+
+            function shareCaption() {
+                const text = captions[currentPage];
+                const shareData = {
+                    title: 'অদৃশ্য মায়া - M Zixu. Z Panthom',
+                    text: text + '\n\n— অদৃশ্য মায়া (M Zixu. Z Panthom)',
+                };
+                if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                    navigator.share(shareData).catch(() => {
+                        copyCaption();
+                        showToast('শেয়ার করা গেল না, কপি করা হয়েছে 📋');
+                    });
+                } else {
+                    copyCaption();
+                    showToast('শেয়ার করতে কপি করা হয়েছে 📋');
+                }
+            }
+
+            // ──────────────────────────────────────
+            // SEARCH
+            // ──────────────────────────────────────
+            function openSearch() {
+                searchOverlay.classList.add('active');
+                searchInput.value = '';
+                searchResults.innerHTML = '';
+                setTimeout(() => searchInput.focus(), 300);
+            }
+
+            function closeSearch() {
+                searchOverlay.classList.remove('active');
+                searchInput.value = '';
+                searchResults.innerHTML = '';
+            }
+
+            function performSearch() {
+                const query = searchInput.value.trim().toLowerCase();
+                if (query.length < 2) {
+                    searchResults.innerHTML =
+                        '<p style="color:var(--text-secondary);text-align:center;padding:20px;">অন্তত ২টি অক্ষর লিখুন...</p>';
+                    return;
+                }
+                const results = [];
+                captions.forEach((cap, idx) => {
+                    if (cap.toLowerCase().includes(query)) {
+                        results.push({ index: idx, text: cap });
+                    }
+                });
+                if (results.length === 0) {
+                    searchResults.innerHTML =
+                        '<p style="color:var(--text-secondary);text-align:center;padding:20px;">কিছু পাওয়া যায়নি 🔍</p>';
+                } else {
+                    searchResults.innerHTML = results.map(r => `
+                <div class="search-result-item" data-index="${r.index}">
+                  <span class="result-num">পৃষ্ঠা ${r.index + 1}</span>
+                  ${highlightMatch(r.text, query)}
+                </div>
+              `).join('');
+                    // Add click listeners
+                    searchResults.querySelectorAll('.search-result-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            const idx = parseInt(this.getAttribute('data-index'));
+                            goToPage(idx, 'page-turn-next');
+                            closeSearch();
+                        });
+                    });
+                }
+            }
+
+            function highlightMatch(text, query) {
+                const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                return text.replace(regex,
+                    '<mark style="background:var(--accent-glow);color:var(--accent);padding:1px 4px;border-radius:3px;">$1</mark>'
+                    );
+            }
+
+            // ──────────────────────────────────────
+            // FAVORITES PANEL
+            // ──────────────────────────────────────
+            function openFavorites() {
+                favoritesPanel.classList.add('active');
+                renderFavorites();
+            }
+
+            function closeFavorites() {
+                favoritesPanel.classList.remove('active');
+            }
+
+            function renderFavorites() {
+                if (favorites.length === 0) {
+                    favoritesList.innerHTML =
+                        '<p style="color:var(--text-secondary);text-align:center;padding:20px;">এখনো কোনো প্রিয় ক্যাপশন নেই 💔</p>';
+                } else {
+                    favoritesList.innerHTML = favorites.map(fIdx => `
+                <div class="fav-item" data-index="${fIdx}">
+                  <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px;">
+                    ${captions[fIdx].substring(0, 55)}...
+                  </span>
+                  <span class="fav-remove" data-index="${fIdx}" title="সরান">✕</span>
+                </div>
+              `).join('');
+                    // Click to navigate
+                    favoritesList.querySelectorAll('.fav-item').forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            if (e.target.classList.contains('fav-remove')) return;
+                            const idx = parseInt(this.getAttribute('data-index'));
+                            goToPage(idx, 'page-turn-next');
+                            closeFavorites();
+                        });
+                    });
+                    // Remove button
+                    favoritesList.querySelectorAll('.fav-remove').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const idx = parseInt(this.getAttribute('data-index'));
+                            const arrIdx = favorites.indexOf(idx);
+                            if (arrIdx > -1) {
+                                favorites.splice(arrIdx, 1);
+                                saveToStorage();
+                                renderFavorites();
+                                updateFavButton();
+                                if (favorites.includes(currentPage)) {
+                                    captionCard.classList.add('favorited');
+                                } else {
+                                    captionCard.classList.remove('favorited');
+                                }
+                                showToast('প্রিয় থেকে সরানো হয়েছে 💔');
+                            }
+                        });
+                    });
+                }
+            }
+
+            // ──────────────────────────────────────
+            // AUTO-HIDE CONTROLS
+            // ──────────────────────────────────────
+            function resetAutoHide() {
+                topBar.classList.remove('auto-hidden');
+                bottomNav.classList.remove('auto-hidden');
+                clearTimeout(autoHideTimer);
+                autoHideTimer = setTimeout(() => {
+                    topBar.classList.add('auto-hidden');
+                    bottomNav.classList.add('auto-hidden');
+                }, 4000);
+            }
+
+            // ──────────────────────────────────────
+            // TOUCH / SWIPE
+            // ──────────────────────────────────────
+            function handleTouchStart(e) {
+                if (e.target.closest('button') || e.target.closest('input') ||
+                    e.target.closest('#search-overlay') || e.target.closest('#favorites-panel')) {
+                    return;
+                }
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                touchMoved = false;
+                isSwiping = false;
+                captionCard.classList.remove('swiping-left', 'swiping-right');
+            }
+
+            function handleTouchMove(e) {
+                if (e.target.closest('button') || e.target.closest('input') ||
+                    e.target.closest('#search-overlay') || e.target.closest('#favorites-panel')) {
+                    return;
+                }
+                const dx = e.touches[0].clientX - touchStartX;
+                const dy = e.touches[0].clientY - touchStartY;
+                if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+                    touchMoved = true;
+                    isSwiping = true;
+                    if (dx < -15) {
+                        captionCard.classList.add('swiping-left');
+                        captionCard.classList.remove('swiping-right');
+                    } else if (dx > 15) {
+                        captionCard.classList.add('swiping-right');
+                        captionCard.classList.remove('swiping-left');
+                    }
+                    e.preventDefault();
+                }
+            }
+
+            function handleTouchEnd(e) {
+                captionCard.classList.remove('swiping-left', 'swiping-right');
+                if (!touchMoved || !isSwiping) return;
+                const dx = e.changedTouches[0].clientX - touchStartX;
+                if (dx < -swipeThreshold) {
+                    nextPage();
+                } else if (dx > swipeThreshold) {
+                    prevPage();
+                }
+                isSwiping = false;
+                touchMoved = false;
+            }
+
+            // ──────────────────────────────────────
+            // EVENT LISTENERS
+            // ──────────────────────────────────────
+            function setupEventListeners() {
+                // Navigation buttons
+                document.getElementById('btn-next').addEventListener('click', () => { nextPage();
+                    resetAutoHide(); });
+                document.getElementById('btn-prev').addEventListener('click', () => { prevPage();
+                    resetAutoHide(); });
+                document.getElementById('btn-random').addEventListener('click', () => { randomPage();
+                    resetAutoHide(); });
+                document.getElementById('btn-fav').addEventListener('click', () => { toggleFavorite();
+                    resetAutoHide(); });
+                document.getElementById('btn-copy').addEventListener('click', () => { copyCaption();
+                    resetAutoHide(); });
+                document.getElementById('btn-share').addEventListener('click', () => { shareCaption();
+                    resetAutoHide(); });
+
+                // Font size
+                document.getElementById('btn-font-plus').addEventListener('click', () => {
+                    if (fontSizeLevel < 4) fontSizeLevel++;
+                    applyFontSize();
+                    saveToStorage();
+                    resetAutoHide();
+                });
+                document.getElementById('btn-font-minus').addEventListener('click', () => {
+                    if (fontSizeLevel > 0) fontSizeLevel--;
+                    applyFontSize();
+                    saveToStorage();
+                    resetAutoHide();
+                });
+
+                // Theme toggle
+                document.getElementById('btn-theme').addEventListener('click', () => {
+                    isDarkMode = !isDarkMode;
+                    applyTheme();
+                    saveToStorage();
+                    resetAutoHide();
+                });
+
+                // Menu button opens search
+                document.getElementById('btn-menu').addEventListener('click', () => {
+                    openSearch();
+                    resetAutoHide();
+                });
+
+                // Search
+                document.getElementById('btn-search-close').addEventListener('click', closeSearch);
+                searchInput.addEventListener('input', performSearch);
+                searchOverlay.addEventListener('click', function(e) {
+                    if (e.target === searchOverlay) closeSearch();
+                });
+
+                // Favorites panel
+                document.getElementById('btn-fav-close').addEventListener('click', closeFavorites);
+                favoritesPanel.addEventListener('click', function(e) {
+                    if (e.target === favoritesPanel) closeFavorites();
+                });
+                // Long press on fav button opens favorites panel
+                let favPressTimer;
+                btnFav.addEventListener('mousedown', () => {
+                    favPressTimer = setTimeout(() => { openFavorites(); }, 600);
+                });
+                btnFav.addEventListener('mouseup', () => { clearTimeout(favPressTimer); });
+                btnFav.addEventListener('mouseleave', () => { clearTimeout(favPressTimer); });
+                btnFav.addEventListener('touchstart', () => {
+                    favPressTimer = setTimeout(() => { openFavorites(); }, 600);
+                }, { passive: true });
+                btnFav.addEventListener('touchend', () => { clearTimeout(favPressTimer); });
+                btnFav.addEventListener('touchmove', () => { clearTimeout(favPressTimer); });
+
+                // Touch swipe on card area
+                const cardArea = document.getElementById('card-area');
+                cardArea.addEventListener('touchstart', handleTouchStart, { passive: false });
+                cardArea.addEventListener('touchmove', handleTouchMove, { passive: false });
+                cardArea.addEventListener('touchend', handleTouchEnd);
+
+                // Keyboard navigation
+                document.addEventListener('keydown', function(e) {
+                    if (searchOverlay.classList.contains('active') || favoritesPanel.classList.contains(
+                            'active')) {
+                        if (e.key === 'Escape') {
+                            closeSearch();
+                            closeFavorites();
+                        }
+                        return;
+                    }
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault();
+                        nextPage();
+                        resetAutoHide(); }
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault();
+                        prevPage();
+                        resetAutoHide(); }
+                    if (e.key === 'r' || e.key === 'R') { randomPage();
+                        resetAutoHide(); }
+                    if (e.key === 'f' || e.key === 'F') { toggleFavorite();
+                        resetAutoHide(); }
+                    if (e.key === 'c' || e.key === 'C') { copyCaption();
+                        resetAutoHide(); }
+                    if (e.key === '/') { e.preventDefault();
+                        openSearch(); }
+                });
+
+                // General touch to reset auto-hide
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('#search-overlay') && !e.target.closest('#favorites-panel')) {
+                        resetAutoHide();
+                    }
+                });
+                document.addEventListener('touchstart', function(e) {
+                    if (!e.target.closest('#search-overlay') && !e.target.closest('#favorites-panel') && !e
+                        .target.closest('button') && !e.target.closest('input')) {
+                        resetAutoHide();
+                    }
+                }, { passive: true });
+
+                // Initial auto-hide
+                resetAutoHide();
+            }
+
+            // ──────────────────────────────────────
+            // START APP
+            // ──────────────────────────────────────
+            init();
+
+            console.log('📖 অদৃশ্য মায়া — M Zixu. Z Panthom');
+            console.log('✨ ' + totalCaptions + ' unique Bengali captions ready.');
+            console.log('📄 Current page: ' + (currentPage + 1));
+            console.log('💡 Swipe left/right • Arrow keys • Search with / key • Long-press ❤️ for favorites');
+        })();
+    </script>
+</body>
+</html>
